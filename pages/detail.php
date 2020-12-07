@@ -1,3 +1,21 @@
+<?php
+$id = $_GET["id"];
+//var_dump($id);
+$dsn = "mysql:host=localhost;dbname=restaurantdb;charset=utf8";
+$user = "restaurantdb_admin";
+$password = "admin123";
+$pdo = new PDO($dsn, $user, $password);
+$sql = "select * from restaurants where id = $id";
+$sql1 = "select * from reviews where restaurant_id = $id";
+$pstmt = $pdo->prepare($sql);
+$pstmt1 = $pdo->prepare($sql1);
+$pstmt->execute();
+$pstmt1->execute();
+$record = $pstmt->fetchAll(PDO::FETCH_ASSOC);
+$reviews = $pstmt1->fetchAll(PDO::FETCH_ASSOC);
+//var_dump($record);
+//var_dump($reviews);
+?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -15,48 +33,37 @@
 		<article class="detail">
 			<h2>レストラン詳細</h2>
 			<section>
+			    <?php foreach ($record as $res){ ?>
 				<table class="list">
 					<tr>
-						<td class="photo"><img name="image" src="../pages/img/restaurant_1.jpg" /></td>
+						<td class="photo"><img name="image" src="../pages/img/<?php echo $res["image"]; ?>" /></td>
 						<td class="info">
 							<dl>
-								<dt name="name">レストラン さくら</dt>
+								<dt name="name"><?php echo $res["name"]; ?></dt>
 								<dd name="description">
-									四季折々の自然を楽しむ伊豆市に、ひっそりと佇む隠れ家レストラン。
-									旅行でいらっしゃった方も、お近くの方も、お気軽にお立ち寄りください。
+									<?php echo $res["description"]; ?>
 								</dd>
 							</dl>
 						</td>
 					</tr>
 				</table>
+			    <?php } ?>
 			</section>
 		</article>
 		<article class="reviews">
 			<h2>レビュ一覧</h2>
 			<section>
+			    <?php foreach ($reviews as $rev){ ?>
 				<dl class="review">
-					<dt name="point">★★★★☆</dt>
+					<dt name="point"><?php $po = $rev["point"]; for($i = 0;$i < $po;$i++){ echo "★";}for($j = 0;$j < 5-$po;$j++){echo "☆";}?></dt>
 					<dd name="description">
-							常連の者で、いつも夫婦で伺っています。
-							席数が少ないので予約した方が安心ですが、その分落ち着いて食事できますよ。
-							コースのメインは基本的にシェフにお任せ。
-							来るたびに、新しい味との出会いを楽しめるお店です。
+							<?php echo $rev["comment"]; ?>
 							<div name="posted">
-								（<span name="posted_at">2020-09-14 05:29:01</span><span name="reviewer">totsuka</span>さん）
+								（<span name="posted_at"><span><span name="reviewer"><?php $rev["reviewer"]; ?></span>さん）
 							</div>
 					</dd>
 				</dl>
-				<dl class="review">
-					<dt name="point">★★★★★</dt>
-					<dd name="description">
-							説明の通り、喧騒を外れた場所にひっそりとあるレストランでした。
-							伊豆市には初めて来ましたが、本当に桜がきれいですね。
-							何よりも空気がきれいで、いいリフレッシュになりました。
-							<div name="posted">
-								（<span name="posted_at">2020-09-12 15:43:45</span><span name="reviewer">oie</span>さん）
-							</div>
-					</dd>
-				</dl>
+				<?php } ?>
 			</section>
 		</article>
 		<article class="entry">
