@@ -7,14 +7,27 @@ $password = "admin123";
 $pdo = new PDO($dsn, $user, $password);
 $sql = "select * from restaurants where id = $id";
 $sql1 = "select * from reviews where restaurant_id = $id";
+$sql2 = "select * from reviews";
 $pstmt = $pdo->prepare($sql);
 $pstmt1 = $pdo->prepare($sql1);
+$pstmt2 = $pdo->prepare($sql2);
 $pstmt->execute();
 $pstmt1->execute();
+$pstmt2->execute();
 $record = $pstmt->fetchAll(PDO::FETCH_ASSOC);
 $reviews = $pstmt1->fetchAll(PDO::FETCH_ASSOC);
+$rewes = $pstmt2->fetchAll(PDO::FETCH_ASSOC);
 //var_dump($record);
 //var_dump($reviews);
+$count = count($rewes);
+$count++;
+$name = $_POST["name"];
+$point = $_POST["point"];
+$comment = $_POST["comment"];
+$time = date("Y-m-d H:i:s");
+$sql4 = "insert into reviews (id,restaurant_id,reviewer,comment,point,posted_at) values ($count,$id,'$name','$comment',$point,'$time')";
+$pstmt3 = $pdo->prepare($sql4);
+$pstmt3->execute();
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -59,7 +72,7 @@ $reviews = $pstmt1->fetchAll(PDO::FETCH_ASSOC);
 					<dd name="description">
 							<?php echo $rev["comment"]; ?>
 							<div name="posted">
-								（<span name="posted_at"><span><span name="reviewer"><?php $rev["reviewer"]; ?></span>さん）
+								（<span name="posted_at"><?php $rev["posted_at"]; ?><span name="reviewer"><?php $rev["reviewer"]; ?></span>さん）
 							</div>
 					</dd>
 				</dl>
@@ -69,7 +82,7 @@ $reviews = $pstmt1->fetchAll(PDO::FETCH_ASSOC);
 		<article class="entry">
 			<h2>レビュを書き込む</h2>
 			<section>
-				<form action="detail.php" method="post">
+				<form action="detail.php?id=<?php echo $id ?>" method="post">
 					<table class="entry">
 						<tr>
 							<th>お名前</th>
